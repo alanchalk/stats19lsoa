@@ -4,7 +4,11 @@
 .httr-oauth
 .DS_Store
 .quarto
-/data-raw
+# data-raw: track scripts, ignore large source files
+/data-raw/rawdata/
+/data-raw/*.xlsx
+/data-raw/*.csv
+/data-raw/*.zip
 inst/doc
 /doc/
 /Meta/
