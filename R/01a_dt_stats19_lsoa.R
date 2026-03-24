@@ -1,4 +1,6 @@
-#' stats19 data for 2019-2022, summarised to lsoa with socio-demographic indices
+#' STATS19 road traffic accident data (2018-2022) summarised to LSOA with
+#' socio-demographic indices from the 2021 UK Census and Index of Multiple
+#' Deprivation (IMD) 2019
 #'
 #' The STATS19 database is a collection of all road traffic accidents in
 #' England, Scotland and Wales that resulted in a personal injury and were
@@ -6,36 +8,210 @@
 #' through the convenient R package stats19 (see reference below).
 #'
 #' Accident numbers (excluding those on motorways and A(M) roads) have been
-#' summarised by year and quarter and by lsoa.  lsoa is a geographical division
-#' of England and Wales into about 32,000 different areas.
+#' summarised by year and quarter and by LSOA.  LSOA is a geographical division
+#' of England and Wales into about 32,000 different areas, each with an average
+#' of approximately 1,500 residents or 650 households.
 #'
-#' The 2021 UK census datasets at lsoa are freely available and various of these
-#' datasets have been merged on, to act as features for the preditive analysis
-#' that this dataset is intended for.
-#'
-#'
+#' The 2021 UK census datasets at LSOA level are freely available and various of
+#' these datasets have been merged on, to act as features for the predictive
+#' analysis that this dataset is intended for.
 #'
 #' @usage data(dt_stats19_lsoa)
 #'
 #' @format A data frame with 276,730 rows and 168 columns:
 #' \describe{
-#'   \item{lsoa}{A geographical area code}
-#'   \item{column names starting with c_ts}{about 165 features from the census data}
-#'   \item{column names other}{some other features}
-#'   \item{yyqq}{year and quarter of the accident}
-#'   \item{nu_cl}{number of accidents}
-#'   \item{number_of_vehicles}{total number of vehicles involved in the accidents}
-#'   \item{number_of_casualties}{total number of injured persons}
+#'
+#' \item{lsoa}{Lower-layer Super Output Area code (e.g. E01000001)}
+#'
+#' \item{c_ts001_restype_tot}{Census TS001: Total usual residents}
+#' \item{c_ts001_restype_hh}{Census TS001: Lives in a household}
+#' \item{c_ts001_restype_ce}{Census TS001: Lives in a communal establishment}
+#' \item{c_ts001_restype_cepct}{Derived: c_ts001_restype_ce / c_ts001_restype_tot * 100}
+#'
+#' \item{c_ts002_mcp_tot}{Census TS002: Marital and civil partnership status: Total (aged 16+)}
+#' \item{c_ts002_mcp_never}{Census TS002: Never married and never registered a civil partnership}
+#' \item{c_ts002_mcp_mrcp}{Census TS002: Married or in a registered civil partnership}
+#' \item{c_ts002_mcp_m}{Census TS002: Married}
+#' \item{c_ts002_mcp_mos}{Census TS002: Married: Opposite sex}
+#' \item{c_ts002_mcp_mss}{Census TS002: Married: Same sex}
+#' \item{c_ts002_mcp_rcp}{Census TS002: In a registered civil partnership}
+#' \item{c_ts002_mcp_rcpos}{Census TS002: In a registered civil partnership: Opposite sex}
+#' \item{c_ts002_mcp_rcpss}{Census TS002: In a registered civil partnership: Same sex}
+#' \item{c_ts002_mcp_slmcp}{Census TS002: Separated, but still legally married or in a civil partnership}
+#' \item{c_ts002_mcp_slm}{Census TS002: Separated, but still married}
+#' \item{c_ts002_mcp_slcp}{Census TS002: Separated, but still in a registered civil partnership}
+#' \item{c_ts002_mcp_dcpd}{Census TS002: Divorced or civil partnership dissolved}
+#' \item{c_ts002_mcp_d}{Census TS002: Divorced}
+#' \item{c_ts002_mcp_cpd}{Census TS002: Formerly in a civil partnership now legally dissolved}
+#' \item{c_ts002_mcp_wscp}{Census TS002: Widowed or surviving civil partnership partner}
+#' \item{c_ts002_mcp_w}{Census TS002: Widowed}
+#' \item{c_ts002_mcp_scp}{Census TS002: Surviving partner from civil partnership}
+#' \item{c_ts002_mcp_tot_pct}{Derived: c_ts002_mcp_tot as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_never_pct}{Derived: c_ts002_mcp_never as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_mrcp_pct}{Derived: c_ts002_mcp_mrcp as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_m_pct}{Derived: c_ts002_mcp_m as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_mos_pct}{Derived: c_ts002_mcp_mos as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_mss_pct}{Derived: c_ts002_mcp_mss as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_rcp_pct}{Derived: c_ts002_mcp_rcp as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_rcpos_pct}{Derived: c_ts002_mcp_rcpos as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_rcpss_pct}{Derived: c_ts002_mcp_rcpss as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_slmcp_pct}{Derived: c_ts002_mcp_slmcp as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_slm_pct}{Derived: c_ts002_mcp_slm as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_slcp_pct}{Derived: c_ts002_mcp_slcp as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_dcpd_pct}{Derived: c_ts002_mcp_dcpd as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_d_pct}{Derived: c_ts002_mcp_d as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_cpd_pct}{Derived: c_ts002_mcp_cpd as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_wscp_pct}{Derived: c_ts002_mcp_wscp as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_w_pct}{Derived: c_ts002_mcp_w as percentage of c_ts001_restype_tot}
+#' \item{c_ts002_mcp_scp_pct}{Derived: c_ts002_mcp_scp as percentage of c_ts001_restype_tot}
+#'
+#' \item{c_ts003_hc_tot}{Census TS003: Household composition: Total households}
+#' \item{c_ts003_hc_oph}{Census TS003: One person household}
+#' \item{c_ts003_hc_oph66p}{Census TS003: One person household: Aged 66 years and over}
+#' \item{c_ts003_hc_opho}{Census TS003: One person household: Other}
+#' \item{c_ts003_hc_sfh}{Census TS003: Single family household}
+#' \item{c_ts003_hc_sfh66p}{Census TS003: Single family household: All aged 66 years and over}
+#' \item{c_ts003_hc_sfhmcp}{Census TS003: Single family household: Married or civil partnership couple}
+#' \item{c_ts003_hc_sfhmcpnc}{Census TS003: Married or civil partnership couple: No children}
+#' \item{c_ts003_hc_sfhmcpdc}{Census TS003: Married or civil partnership couple: Dependent children}
+#' \item{c_ts003_hc_sfhmcpacnd}{Census TS003: Married or civil partnership couple: All children non-dependent}
+#' \item{c_ts003_hc_sfhccf}{Census TS003: Cohabiting couple family}
+#' \item{c_ts003_hc_sfhccfnc}{Census TS003: Cohabiting couple family: No children}
+#' \item{c_ts003_hc_sfhccfdc}{Census TS003: Cohabiting couple family: With dependent children}
+#' \item{c_ts003_hc_sfhccfacnd}{Census TS003: Cohabiting couple family: All children non-dependent}
+#' \item{c_ts003_hc_sfhlpf}{Census TS003: Lone parent family}
+#' \item{c_ts003_hc_sfhlpfdc}{Census TS003: Lone parent family: With dependent children}
+#' \item{c_ts003_hc_sfhlpfacnd}{Census TS003: Lone parent family: All children non-dependent}
+#' \item{c_ts003_hc_sfhosfh}{Census TS003: Other single family household}
+#' \item{c_ts003_hc_sfhosfho}{Census TS003: Other single family household: Other family composition}
+#' \item{c_ts003_hc_oht}{Census TS003: Other household types}
+#' \item{c_ts003_hc_ohtdc}{Census TS003: Other household types: With dependent children}
+#' \item{c_ts003_hc_ohto}{Census TS003: Other household types: Other, including all full-time students and all aged 66+}
+#' \item{c_ts003_hc_oph_pct}{Derived: One person households as percentage of total households}
+#' \item{c_ts003_hc_sfh_pct}{Derived: Single family households as percentage of total households}
+#' \item{c_ts003_hc_oht_pct}{Derived: Other household types as percentage of total households}
+#'
+#' \item{c_ts004_cob_tot}{Census TS004: Country of birth: Total}
+#' \item{c_ts004_cob_uk}{Census TS004: Country of birth: United Kingdom}
+#' \item{c_ts004_cob_eu}{Census TS004: Country of birth: EU countries}
+#' \item{c_ts004_cob_uk_pct}{Derived: UK-born as percentage of total}
+#' \item{c_ts004_cob_eu_pct}{Derived: EU-born as percentage of total}
+#' \item{c_ts004_cob_oth_pct}{Derived: 100 - UK pct - EU pct}
+#'
+#' \item{c_ts007a_age_tot}{Census TS007a: Age: Total usual residents}
+#' \item{c_ts007a_age_00_04}{Census TS007a: Aged 4 years and under}
+#' \item{c_ts007a_age_05_09}{Census TS007a: Aged 5 to 9}
+#' \item{c_ts007a_age_10_14}{Census TS007a: Aged 10 to 14}
+#' \item{c_ts007a_age_15_19}{Census TS007a: Aged 15 to 19}
+#' \item{c_ts007a_age_20_24}{Census TS007a: Aged 20 to 24}
+#' \item{c_ts007a_age_25_29}{Census TS007a: Aged 25 to 29}
+#' \item{c_ts007a_age_30_34}{Census TS007a: Aged 30 to 34}
+#' \item{c_ts007a_age_35_39}{Census TS007a: Aged 35 to 39}
+#' \item{c_ts007a_age_40_44}{Census TS007a: Aged 40 to 44}
+#' \item{c_ts007a_age_45_49}{Census TS007a: Aged 45 to 49}
+#' \item{c_ts007a_age_50_54}{Census TS007a: Aged 50 to 54}
+#' \item{c_ts007a_age_55_59}{Census TS007a: Aged 55 to 59}
+#' \item{c_ts007a_age_60_64}{Census TS007a: Aged 60 to 64}
+#' \item{c_ts007a_age_65_69}{Census TS007a: Aged 65 to 69}
+#' \item{c_ts007a_age_70_74}{Census TS007a: Aged 70 to 74}
+#' \item{c_ts007a_age_75_79}{Census TS007a: Aged 75 to 79}
+#' \item{c_ts007a_age_80_84}{Census TS007a: Aged 80 to 84}
+#' \item{c_ts007a_age_85_}{Census TS007a: Aged 85 and over}
+#' \item{c_ts007a_age_00_15_pct}{Derived: Aged 0-15 as percentage of total}
+#' \item{c_ts007a_age_15_29_pct}{Derived: Aged 15-29 as percentage of total}
+#' \item{c_ts007a_age_30_64_pct}{Derived: Aged 30-64 as percentage of total}
+#' \item{c_ts007a_age_65_pct}{Derived: Aged 65+ as percentage of total}
+#'
+#' \item{c_ts008_sex_tot}{Census TS008: Sex: All persons}
+#' \item{c_ts008_sex_f}{Census TS008: Female}
+#' \item{c_ts008_sex_m}{Census TS008: Male}
+#' \item{c_ts008_sex_f_pct}{Derived: Female as percentage of total}
+#'
+#' \item{c_ts011_hhd_tot}{Census TS011: Household deprivation: Total households}
+#' \item{c_ts011_hhd_0}{Census TS011: Household is not deprived in any dimension}
+#' \item{c_ts011_hhd_1}{Census TS011: Household is deprived in one dimension}
+#' \item{c_ts011_hhd_2}{Census TS011: Household is deprived in two dimensions}
+#' \item{c_ts011_hhd_3}{Census TS011: Household is deprived in three dimensions}
+#' \item{c_ts011_hhd_4}{Census TS011: Household is deprived in four dimensions}
+#' \item{c_ts011_hhd_0_pct}{Derived: Not deprived as percentage of total households}
+#' \item{c_ts011_hhd_1_pct}{Derived: Deprived in 1 dimension as percentage of total}
+#' \item{c_ts011_hhd_2_pct}{Derived: Deprived in 2 dimensions as percentage of total}
+#' \item{c_ts011_hhd_3_pct}{Derived: Deprived in 3 dimensions as percentage of total}
+#' \item{c_ts011_hhd_4_pct}{Derived: Deprived in 4 dimensions as percentage of total}
+#'
+#' \item{c_ts058_dtw_tot}{Census TS058: Distance travelled to work: Total (aged 16+ in employment)}
+#' \item{c_ts058_dtw_00_01}{Census TS058: Less than 2km}
+#' \item{c_ts058_dtw_02_04}{Census TS058: 2km to less than 5km}
+#' \item{c_ts058_dtw_05_09}{Census TS058: 5km to less than 10km}
+#' \item{c_ts058_dtw_10_19}{Census TS058: 10km to less than 20km}
+#' \item{c_ts058_dtw_home}{Census TS058: Works mainly from home}
+#' \item{c_ts058_dtw_offshore}{Census TS058: Works mainly at an offshore installation, in no fixed place, or outside the UK}
+#' \item{c_ts058_dtw_20_}{Census TS058: 20km and over}
+#' \item{c_ts058_dtw_00_01_pct}{Derived: Less than 2km as percentage of total}
+#' \item{c_ts058_dtw_02_04_pct}{Derived: 2-5km as percentage of total}
+#' \item{c_ts058_dtw_05_09_pct}{Derived: 5-10km as percentage of total}
+#' \item{c_ts058_dtw_10_19_pct}{Derived: 10-20km as percentage of total}
+#' \item{c_ts058_dtw_20__pct}{Derived: 20km+ as percentage of total}
+#' \item{c_ts058_dtw_home_pct}{Derived: Works from home as percentage of total}
+#' \item{c_ts058_dtw_offshore_pct}{Derived: Offshore/no fixed place as percentage of total}
+#'
+#' \item{c_ts063_occ_tot}{Census TS063: Occupation: Total (aged 16+ in employment)}
+#' \item{c_ts063_occ_1}{Census TS063: 1. Managers, directors and senior officials}
+#' \item{c_ts063_occ_2}{Census TS063: 2. Professional occupations}
+#' \item{c_ts063_occ_3}{Census TS063: 3. Associate professional and technical occupations}
+#' \item{c_ts063_occ_4}{Census TS063: 4. Administrative and secretarial occupations}
+#' \item{c_ts063_occ_5}{Census TS063: 5. Skilled trades occupations}
+#' \item{c_ts063_occ_6}{Census TS063: 6. Caring, leisure and other service occupations}
+#' \item{c_ts063_occ_7}{Census TS063: 7. Sales and customer service occupations}
+#' \item{c_ts063_occ_8}{Census TS063: 8. Process, plant and machine operatives}
+#' \item{c_ts063_occ_9}{Census TS063: 9. Elementary occupations}
+#' \item{c_ts063_occ_1_pct}{Derived: SOC 1 as percentage of total employed}
+#' \item{c_ts063_occ_2_pct}{Derived: SOC 2 as percentage of total employed}
+#' \item{c_ts063_occ_3_pct}{Derived: SOC 3 as percentage of total employed}
+#' \item{c_ts063_occ_4_pct}{Derived: SOC 4 as percentage of total employed}
+#' \item{c_ts063_occ_5_pct}{Derived: SOC 5 as percentage of total employed}
+#' \item{c_ts063_occ_6_pct}{Derived: SOC 6 as percentage of total employed}
+#' \item{c_ts063_occ_7_pct}{Derived: SOC 7 as percentage of total employed}
+#' \item{c_ts063_occ_8_pct}{Derived: SOC 8 as percentage of total employed}
+#' \item{c_ts063_occ_9_pct}{Derived: SOC 9 as percentage of total employed}
+#'
+#' \item{lsoa_desc}{LSOA name (e.g. "City of London 001A")}
+#' \item{pop}{Mid-2020 population estimate for the LSOA}
+#' \item{area}{Area of the LSOA in hectares}
+#' \item{popdens}{Population density: pop / area (persons per hectare)}
+#' \item{lad_code}{Local Authority District code}
+#' \item{lad}{Local Authority District name}
+#'
+#' \item{imd_rank}{IoD 2019: Index of Multiple Deprivation percentile (0-100). Overall deprivation combining seven domains with weights: Income (22.5\%), Employment (22.5\%), Education/Skills/Training (13.5\%), Health/Disability (13.5\%), Crime (9.3\%), Barriers to Housing/Services (9.3\%), Living Environment (9.3\%)}
+#' \item{income_rank}{IoD 2019: Income Deprivation domain percentile. Measures the proportion of the population experiencing deprivation relating to low income, including both out-of-work and low-earning workers}
+#' \item{employment_rank}{IoD 2019: Employment Deprivation domain percentile. Measures the proportion of the working-age population involuntarily excluded from the labour market due to unemployment, sickness, disability, or caring responsibilities}
+#' \item{est_rank}{IoD 2019: Education, Skills and Training domain percentile. Measures the lack of attainment and skills in the local population, with sub-domains for children/young people and adult skills}
+#' \item{hd_rank}{IoD 2019: Health Deprivation and Disability domain percentile. Measures the risk of premature death and impairment of quality of life through poor physical or mental health}
+#' \item{crime_rank}{IoD 2019: Crime domain percentile. Measures the risk of personal and material victimisation at local level}
+#' \item{bhs_rank}{IoD 2019: Barriers to Housing and Services domain percentile. Measures the physical and financial accessibility of housing and local services, with sub-domains for geographical barriers and wider barriers}
+#' \item{le_rank}{IoD 2019: Living Environment domain percentile. Measures the quality of the local environment, with sub-domains for indoors (housing quality) and outdoors (air quality and road traffic accidents)}
+#'
+#' \item{cayp_rank}{IoD 2019 sub-domain: Children and Young People percentile. Measures attainment of qualifications and associated measures (education flow)}
+#' \item{as_rank}{IoD 2019 sub-domain: Adult Skills percentile. Measures lack of qualifications in the resident working-age adult population (education stock)}
+#' \item{gb_rank}{IoD 2019 sub-domain: Geographical Barriers percentile. Relates to the physical proximity of local services}
+#' \item{wb_rank}{IoD 2019 sub-domain: Wider Barriers percentile. Relates to access to housing such as affordability}
+#' \item{i_rank}{IoD 2019 sub-domain: Indoors percentile. Measures the quality of housing}
+#' \item{o_rank}{IoD 2019 sub-domain: Outdoors percentile. Measures air quality and road traffic accidents}
+#'
+#' \item{yyqq}{Year and quarter of the accident period (e.g. "2019-Q1")}
+#' \item{nu_cl}{Number of STATS19 reported accidents in this LSOA and quarter. Primary model target}
+#' \item{number_of_vehicles}{Total number of vehicles involved in accidents in this LSOA and quarter}
+#' \item{number_of_casualties}{Total number of injured persons in accidents in this LSOA and quarter}
+#'
 #' }
-#' @source <https://www.ons.gov.uk/datasets/TS003/editions/2021/versions/4>
-#' @source <https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareapopulationdensity>
-#' @source <https://assets.publishing.service.gov.uk/media/5d8b3ade40f0b60999a23330/File_2_-_IoD2019_Domains_of_Deprivation.xlsx>
-#' @source <https://assets.publishing.service.gov.uk/media/5d8b3b24ed915d0373d35410/File_4_-_IoD2019_Sub-domains_of_Deprivation.xlsx>
+#' @source \url{https://www.nomisweb.co.uk/sources/census_2021_bulk}
+#' @source \url{https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareapopulationdensity}
+#' @source \url{https://assets.publishing.service.gov.uk/media/5d8b3ade40f0b60999a23330/File_2_-_IoD2019_Domains_of_Deprivation.xlsx}
+#' @source \url{https://assets.publishing.service.gov.uk/media/5d8b3b24ed915d0373d35410/File_4_-_IoD2019_Sub-domains_of_Deprivation.xlsx}
 #'
 #' @references
 #' Lovelace R, Morgan M, Hama L, Padgham M, Ranzolin D, Sparks A (2019).
-#' “stats 19: A package for working with open road crash data.”
-#' The Journal of Open Source Software, 4(33), 1181. doi:10.21105/joss.01181.#'
+#' "stats19: A package for working with open road crash data."
+#' The Journal of Open Source Software, 4(33), 1181. doi:10.21105/joss.01181.
 #'
 "dt_stats19_lsoa"
-
