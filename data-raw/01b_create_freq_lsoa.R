@@ -1,4 +1,4 @@
-# stats19lsoa/data-raw/02_create_freq_lsoa.R
+# stats19lsoa/data-raw/01b_create_freq_lsoa.R
 #
 # Purpose
 # -------
@@ -6,11 +6,15 @@
 # legacy monograph object produced by 01a_create_data.R and produces a
 # corrected modelling-grain object suitable for Lab 7.
 #
-# Input  : data/dt_stats19_lsoa.RData    (output of 01a_create_data.R, the
-#                                         canonical monograph build —
-#                                         loaded read-only here; this script
-#                                         does not modify the legacy object
-#                                         or its file)
+# Input  : data/dt_stats19_lsoa.rda      (output of 01a_create_data.R, the
+#                                         canonical monograph build, loaded
+#                                         read-only here; this script does
+#                                         not modify the legacy object or its
+#                                         file). 01a's save() literally writes
+#                                         'dt_stats19_lsoa.RData' but the
+#                                         on-disk file in this package uses
+#                                         the R-package-standard '.rda'
+#                                         extension. R's load() accepts either.
 # Output : data/dt_stats19_freq_lsoa.rda
 #
 # Spec   : see GLMStudio_monorepo/docs/en-auto-stats19-dataset-build-plan.md
@@ -36,20 +40,38 @@ library(data.table)
 source(file.path("data-raw", "_constants.R"))
 # Brings vars_ind_toUse and MONOGRAPH_CH7_EXCLUDE into scope.
 
+# Guard: pop must be retained as a trap feature. Step 8 (curation) and Step 10
+# (exposure construction via sum(pop / 4000)) both depend on this.
+stopifnot("pop" %in% vars_ind_toUse)
+
 dir_rdata <- file.path(".", "data")
 
-# Load the legacy monograph object (read-only).
-load(file.path(dir_rdata, "dt_stats19_lsoa.RData"))
+# Load the legacy monograph object (read-only). On-disk file uses '.rda'
+# (R-package convention) even though 01a's save() line names it '.RData';
+# R's load() handles either, and this script adapts to the actual saved
+# artifact rather than renaming the file.
+load(file.path(dir_rdata, "dt_stats19_lsoa.rda"))
 stopifnot(exists("dt_stats19_lsoa"))
 
 # Work on a copy; never mutate the legacy object.
 dt_freq <- copy(dt_stats19_lsoa)
 
-# ---- Step 1: typo fix -------------------------------------------------------
-# Defensive: 01a now produces c_ts001_restype_ce_pct correctly, but older
-# legacy snapshots had c_ts001_restype_cepct. Rename if encountered.
+# ---- Step 1: typo / legacy-name fixes ---------------------------------------
+# Defensive renames for older snapshots of dt_stats19_lsoa.rda. 01a's current
+# code produces the corrected names, but the on-disk .rda may pre-date the
+# fixes:
+#
+#   c_ts001_restype_cepct      -> c_ts001_restype_ce_pct
+#     (missing underscore between 'ce' and 'pct'; noted in 01a's comments)
+#   c_ts007a_age_00_15_pct     -> c_ts007a_age_00_14_pct
+#     (legacy name had '_15_' but the underlying sum covers ages 0-14:
+#      c_ts007a_age_00_04 + 05_09 + 10_14, with the next band 15_29_pct
+#      starting at 15. The '15' in the older name was a typo.)
 if ("c_ts001_restype_cepct" %in% colnames(dt_freq)) {
   setnames(dt_freq, "c_ts001_restype_cepct", "c_ts001_restype_ce_pct")
+}
+if ("c_ts007a_age_00_15_pct" %in% colnames(dt_freq)) {
+  setnames(dt_freq, "c_ts007a_age_00_15_pct", "c_ts007a_age_00_14_pct")
 }
 
 # ---- Step 2: drop Wales (LSOAs with NA IoD ranks — England-only) -----------
@@ -153,8 +175,14 @@ stopifnot(dt_freq[, .(n = uniqueN(fold)), by = lsoa][, max(n)] == 1)
 # already exist from 01a's earlier dt_ts003 / dt_ts007a processing.
 KEEP_COLS <- c("lsoa", "covid_ind", "covid_date", "fold",
                "nu_cl", vars_ind_toUse)
-KEEP_COLS <- intersect(KEEP_COLS, colnames(dt_freq))
-dt_freq   <- dt_freq[, ..KEEP_COLS]
+
+# Fail loud if any expected column is missing from dt_freq — a silent
+# intersect() here would hide a typo in _constants.R or a missing upstream
+# transformation.
+missing_keep <- setdiff(KEEP_COLS, colnames(dt_freq))
+stopifnot(length(missing_keep) == 0)
+
+dt_freq <- dt_freq[, ..KEEP_COLS]
 
 # ---- Step 9: LSOA-constant sanity assertion ---------------------------------
 # Every column claimed as LSOA-constant must be constant within an LSOA.
@@ -162,7 +190,14 @@ dt_freq   <- dt_freq[, ..KEEP_COLS]
 # .SDcols alongside the by-group. vars_ind_toUse already includes 'pop' via
 # vars_trap_extra in _constants.R.
 LSOA_CONSTANT_COLS <- setdiff(vars_ind_toUse, c("lsoa", "covid_ind"))
-LSOA_CONSTANT_COLS <- intersect(LSOA_CONSTANT_COLS, colnames(dt_freq))
+
+# Fail loud rather than silently intersect — Step 8's KEEP_COLS guard already
+# verifies vars_ind_toUse is fully present in dt_freq, so this should never
+# fire; included for symmetry and to catch any future refactor that breaks
+# the invariant.
+missing_lsoa_constant <- setdiff(LSOA_CONSTANT_COLS, names(dt_freq))
+stopifnot(length(missing_lsoa_constant) == 0)
+
 const_check <- dt_freq[, lapply(.SD, uniqueN), by = lsoa,
                         .SDcols = LSOA_CONSTANT_COLS]
 stopifnot(all(as.matrix(const_check[, -"lsoa", with = FALSE]) == 1))
